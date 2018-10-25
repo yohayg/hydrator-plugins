@@ -39,7 +39,13 @@ import org.apache.avro.file.DataFileStream;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.orc.OrcFile;
+import org.apache.orc.Reader;
+import org.apache.orc.mapred.OrcInputFormat;
+import org.apache.orc.mapred.OrcStruct;
+import org.apache.orc.mapreduce.OrcMapreduceRecordReader;
 import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.junit.Assert;
@@ -52,7 +58,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -178,7 +183,8 @@ public class FileSinkTestRun extends ETLBatchTestBase {
     properties.put("path", outputDir.getAbsolutePath());
     properties.put("referenceName", format.name());
     properties.put("format", format.name());
-    properties.put("schema", "${schema}");
+    //properties.put("schema", "${schema}");
+    properties.put("schema", SCHEMA.toString());
     properties.put("delimiter", delimiter);
 
     ETLBatchConfig conf = ETLBatchConfig.builder()
@@ -227,7 +233,7 @@ public class FileSinkTestRun extends ETLBatchTestBase {
    * Consumes a file.
    */
   private interface FileConsumer {
-    void consume(File file) throws IOException;
+    void consume(File file) throws Exception;
   }
 }
 

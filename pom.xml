@@ -32,6 +32,11 @@
     <module>cassandra-plugins</module>
     <module>database-plugins</module>
     <module>format-common</module>
+    <module>formats-avro</module>
+    <module>formats-delimited</module>
+    <module>formats-json</module>
+    <module>formats-orc</module>
+    <module>formats-parquet</module>
     <module>hbase-plugins</module>
     <module>hdfs-plugins</module>
     <module>hive-plugins</module>

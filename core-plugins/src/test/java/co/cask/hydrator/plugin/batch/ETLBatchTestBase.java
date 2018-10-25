@@ -33,6 +33,11 @@ import co.cask.cdap.proto.id.NamespaceId;
 import co.cask.cdap.test.ApplicationManager;
 import co.cask.cdap.test.TestConfiguration;
 import co.cask.cdap.test.WorkflowManager;
+import co.cask.format.avro.AvroOutputFormatProvider;
+import co.cask.format.delimited.DelimitedOutputFormatProvider;
+import co.cask.format.json.JsonOutputFormatProvider;
+import co.cask.format.orc.OrcOutputFormatProvider;
+import co.cask.format.parquet.ParquetOutputFormatProvider;
 import co.cask.hydrator.plugin.alert.TMSAlertPublisher;
 import co.cask.hydrator.plugin.batch.action.EmailAction;
 import co.cask.hydrator.plugin.batch.action.SSHAction;
@@ -49,6 +54,7 @@ import co.cask.hydrator.plugin.batch.sink.TimePartitionedFileSetDataSetORCSink;
 import co.cask.hydrator.plugin.batch.sink.TimePartitionedFileSetDatasetAvroSink;
 import co.cask.hydrator.plugin.batch.sink.TimePartitionedFileSetDatasetParquetSink;
 import co.cask.hydrator.plugin.batch.source.FTPBatchSource;
+import co.cask.hydrator.plugin.batch.source.FileBatchSource;
 import co.cask.hydrator.plugin.batch.source.KVTableSource;
 import co.cask.hydrator.plugin.batch.source.SnapshotFileBatchAvroSource;
 import co.cask.hydrator.plugin.batch.source.SnapshotFileBatchParquetSource;
@@ -75,8 +81,10 @@ import org.apache.avro.mapred.AvroKey;
 import org.apache.avro.mapreduce.AvroKeyOutputFormat;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
+import org.apache.orc.TypeDescription;
 import org.apache.orc.mapred.OrcStruct;
 import org.apache.orc.mapreduce.OrcMapreduceRecordWriter;
+import org.apache.orc.mapreduce.OrcOutputFormat;
 import org.apache.parquet.avro.AvroParquetInputFormat;
 import org.apache.parquet.avro.AvroParquetOutputFormat;
 import org.apache.parquet.avro.AvroParquetReader;
@@ -130,8 +138,6 @@ public class ETLBatchTestBase extends HydratorTestBase {
                       BatchCubeSink.class, KVTableSink.class, TableSink.class,
                       TimePartitionedFileSetDatasetAvroSink.class, AvroKeyOutputFormat.class, AvroKey.class,
                       TimePartitionedFileSetDatasetParquetSink.class, AvroParquetOutputFormat.class,
-                      TimePartitionedFileSetDataSetORCSink.class, OrcStruct.class,
-                      OrcMapreduceRecordWriter.class, TimestampColumnVector.class,
                       SnapshotFileBatchAvroSink.class, SnapshotFileBatchParquetSink.class,
                       SnapshotFileBatchAvroSource.class, SnapshotFileBatchParquetSource.class,
                       FTPBatchSource.class,
@@ -148,6 +154,20 @@ public class ETLBatchTestBase extends HydratorTestBase {
                       TMSAlertPublisher.class,
                       ErrorCollector.class,
                       FileSink.class);
+    // add format plugins
+    addPluginArtifact(NamespaceId.DEFAULT.artifact("core-plugins", "4.0.0"), DATAPIPELINE_ARTIFACT_ID,
+                      FileBatchSource.class);
+    addPluginArtifact(NamespaceId.DEFAULT.artifact("formats-avro", "4.0.0"), DATAPIPELINE_ARTIFACT_ID,
+                      AvroOutputFormatProvider.class, AvroKeyOutputFormat.class);
+    addPluginArtifact(NamespaceId.DEFAULT.artifact("formats-delimited", "4.0.0"), DATAPIPELINE_ARTIFACT_ID,
+                      DelimitedOutputFormatProvider.class);
+    addPluginArtifact(NamespaceId.DEFAULT.artifact("formats-json", "4.0.0"), DATAPIPELINE_ARTIFACT_ID,
+                      JsonOutputFormatProvider.class);
+    addPluginArtifact(NamespaceId.DEFAULT.artifact("formats-orc", "4.0.0"), DATAPIPELINE_ARTIFACT_ID,
+                      OrcOutputFormatProvider.class, OrcOutputFormat.class, OrcStruct.class,
+                      TypeDescription.class, TimestampColumnVector.class);
+    addPluginArtifact(NamespaceId.DEFAULT.artifact("formats-parquet", "4.0.0"), DATAPIPELINE_ARTIFACT_ID,
+                      ParquetOutputFormatProvider.class, AvroParquetOutputFormat.class);
   }
 
   protected List<GenericRecord> readOutput(TimePartitionedFileSet fileSet, Schema schema) throws IOException {
